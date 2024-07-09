@@ -1,10 +1,8 @@
 package br.com.guilherme_momolli.controle_patrimonial.controller;
 
-import br.com.guilherme_momolli.controle_patrimonial.model.Hardware;
 import br.com.guilherme_momolli.controle_patrimonial.model.NotaFiscal;
 import br.com.guilherme_momolli.controle_patrimonial.service.NotaFiscalService;
 
-import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +15,6 @@ public class NotaFiscalController {
 
     @Autowired
     public NotaFiscalService notaFiscalService;
-
 
     @GetMapping("/hello")
     public String helloWorld() {

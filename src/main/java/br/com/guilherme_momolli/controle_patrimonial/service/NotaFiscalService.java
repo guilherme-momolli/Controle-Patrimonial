@@ -2,10 +2,13 @@ package br.com.guilherme_momolli.controle_patrimonial.service;
 
 import br.com.guilherme_momolli.controle_patrimonial.model.NotaFiscal;
 import br.com.guilherme_momolli.controle_patrimonial.repository.NotaFiscalRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -17,10 +20,6 @@ public class NotaFiscalService {
 
     @Autowired
     private NotaFiscalRepository notaFiscalRepository;
-
-    public NotaFiscalService(NotaFiscalRepository notaFiscalRepository) {
-        this.notaFiscalRepository = notaFiscalRepository;
-    }
 
     public ResponseEntity<List<NotaFiscal>> listarNotasFiscais(){
         try{

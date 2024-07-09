@@ -2,6 +2,7 @@ package br.com.guilherme_momolli.controle_patrimonial.controller;
 
 import br.com.guilherme_momolli.controle_patrimonial.model.Endereco;
 import br.com.guilherme_momolli.controle_patrimonial.service.EnderecoService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,8 +14,8 @@ import java.util.List;
 public class EnderecoController{
 
     private EnderecoService enderecoService;
-    @Autowired
 
+    @Autowired
     public EnderecoController(EnderecoService enderecoService) {
         this.enderecoService = enderecoService;
     }

@@ -28,9 +28,6 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    public UsuarioService(UsuarioRepository usuarioRepository){
-        this.usuarioRepository = usuarioRepository;
-    }
 
     public ResponseEntity<List<Usuario>> listarUsuario(){
         try{
