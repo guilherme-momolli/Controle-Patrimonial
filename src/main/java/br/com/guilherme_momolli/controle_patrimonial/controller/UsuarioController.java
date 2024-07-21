@@ -15,12 +15,8 @@ import java.util.List;
 @RequestMapping("/usuario")
 public class UsuarioController{
 
-    private UsuarioService usuarioService;
-
     @Autowired
-    public UsuarioController(UsuarioService usuarioService) {
-        this.usuarioService = usuarioService;
-    }
+    private UsuarioService usuarioService;
 
     @GetMapping("/hello")
     public String helloWorld() {return "Olá, mundo!";}
@@ -42,6 +38,7 @@ public class UsuarioController{
 
     @PostMapping("/login")
     public ResponseEntity<String> loginUsuario(@RequestBody LoginRequestDTO loginRequestDTO){
+        //return usuarioService.loginUsuario(loginRequestDTO);
         String email = loginRequestDTO.getEmail();
         String senha = loginRequestDTO.getSenha();
 

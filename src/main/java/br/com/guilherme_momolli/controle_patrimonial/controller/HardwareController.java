@@ -13,6 +13,7 @@ import java.util.List;
 @RequestMapping("/hardware")
 public class HardwareController {
 
+
     private HardwareService hardwareService;
 
     @Autowired

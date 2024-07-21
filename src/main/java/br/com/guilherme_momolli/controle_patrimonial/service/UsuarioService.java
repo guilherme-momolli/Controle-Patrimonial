@@ -29,6 +29,7 @@ public class UsuarioService {
     private UsuarioRepository usuarioRepository;
 
 
+
     public ResponseEntity<List<Usuario>> listarUsuario(){
         try{
             return new ResponseEntity(usuarioRepository.findAll(), HttpStatus.OK);
@@ -66,17 +67,22 @@ public class UsuarioService {
     }
 
     public ResponseEntity<String> loginUsuario(@RequestBody LoginRequestDTO loginRequestDTO){
-        System.out.println("Entrou");
-        String email = loginRequestDTO.getEmail();
-        String senha = loginRequestDTO.getSenha();
+        try {
 
-        boolean autenticado = autenticar(email, senha);
+            String email1 = loginRequestDTO.getEmail();
+            String senha = loginRequestDTO.getSenha();
 
-        if (autenticado) {
-            return ResponseEntity.ok("Login bem-sucedido!");
-        }
-        else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
+            Usuario usuario = usuarioRepository.findByEmail(email1);
+
+
+            if (passwordEncoder.matches(senha, usuario.getSenha())) {
+                return ResponseEntity.ok("Login bem-sucedido!");
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
+            }
+        }catch (Exception exception){
+            System.out.println(exception.getMessage());
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
 
     }
@@ -110,10 +116,9 @@ public class UsuarioService {
 
     public boolean autenticar(String email, String senha) {
         Usuario usuario = usuarioRepository.findByEmail(email);
-        if (usuario != null) {
-            return passwordEncoder.matches(senha, usuario.getSenha());
+        if (usuario != null && passwordEncoder.matches(senha, usuario.getSenha())) {
+            return true;
         }
         return false;
     }
-
 }

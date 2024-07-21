@@ -14,7 +14,7 @@ import java.util.List;
 public class NotaFiscalController {
 
     @Autowired
-    public NotaFiscalService notaFiscalService;
+    private NotaFiscalService notaFiscalService;
 
     @GetMapping("/hello")
     public String helloWorld() {
@@ -30,7 +30,6 @@ public class NotaFiscalController {
     public ResponseEntity<NotaFiscal> getNotaFiscalById(@PathVariable Long id) {
         return notaFiscalService.getById(id);
     }
-
 
     @PostMapping("/create")
     public ResponseEntity<NotaFiscal> criarNotaFiscal(@RequestBody NotaFiscal notaFiscal) {

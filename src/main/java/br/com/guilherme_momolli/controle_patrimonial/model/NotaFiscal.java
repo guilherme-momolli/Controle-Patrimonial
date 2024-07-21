@@ -21,12 +21,16 @@ public class NotaFiscal {
 
     private String cnpj;
 
+    @Column(name="data_compra")
+    @Temporal(TemporalType.TIMESTAMP)
     private Timestamp dataCompra;
 
     @Column(name="preco_compra")
-    private double precoCompra;
+    private Double precoCompra;
 
-    @OneToOne
-    @JoinColumn(name = "endereco_id")
-    private Endereco endereco_id;
+//    @OneToOne(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "endereco_id", referencedColumnName = "id")
+//    private int enderecoId;
+
+
 }

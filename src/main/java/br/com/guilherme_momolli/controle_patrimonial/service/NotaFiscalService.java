@@ -21,6 +21,10 @@ public class NotaFiscalService {
     @Autowired
     private NotaFiscalRepository notaFiscalRepository;
 
+    public NotaFiscalService(NotaFiscalRepository notaFiscalRepository) {
+        this.notaFiscalRepository = notaFiscalRepository;
+    }
+
     public ResponseEntity<List<NotaFiscal>> listarNotasFiscais(){
         try{
             return new ResponseEntity(notaFiscalRepository.findAll(), HttpStatus.OK);
@@ -59,7 +63,7 @@ public class NotaFiscalService {
             notaFiscalParaAtualizar.setCnpj(notaFiscal.getCnpj());
             notaFiscalParaAtualizar.setPrecoCompra(notaFiscal.getPrecoCompra());
             notaFiscalParaAtualizar.setDataCompra(notaFiscal.getDataCompra());
-            notaFiscalParaAtualizar.setEndereco_id(notaFiscal.getEndereco_id());
+ //           notaFiscalParaAtualizar.setEnderecoId(notaFiscal.getEnderecoId());
 
             NotaFiscal update = notaFiscalRepository.save(notaFiscalParaAtualizar);
             return new ResponseEntity<>(update, HttpStatus.OK);

@@ -46,4 +46,18 @@ public class Hardware {
 
     @Enumerated
     private Estatus estatus;
+
+    @OneToOne
+    @JoinColumn(name = "nota_fiscal_id", referencedColumnName = "id")
+    private NotaFiscal notaFiscal;
+
+
+   
+
+    public Hardware(){
+
+    }
+    
+
+
 }

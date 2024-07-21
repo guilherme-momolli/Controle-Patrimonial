@@ -18,7 +18,7 @@ public class EnderecoService {
     @Autowired
     private EnderecoRepository enderecoRepository;
 
-    public EnderecoService(EnderecoRepository enderecoRepository){
+    public EnderecoService(EnderecoRepository enerecoRepository){
         this.enderecoRepository = enderecoRepository;
     }
 
@@ -58,7 +58,7 @@ public class EnderecoService {
             enderecoParaAtualizar.setBairro(endereco.getBairro());
             enderecoParaAtualizar.setNumero(endereco.getNumero());
             enderecoParaAtualizar.setCep(endereco.getCep());
-            enderecoParaAtualizar.setCidade(endereco.getCidade());
+            enderecoParaAtualizar.setMunicipio(endereco.getMunicipio());
             enderecoParaAtualizar.setUf(endereco.getUf());
             enderecoParaAtualizar.setPais(endereco.getPais());
 
