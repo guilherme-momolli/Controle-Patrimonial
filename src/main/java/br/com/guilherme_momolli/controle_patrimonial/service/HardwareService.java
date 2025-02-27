@@ -3,6 +3,7 @@ package br.com.guilherme_momolli.controle_patrimonial.service;
 import br.com.guilherme_momolli.controle_patrimonial.model.Hardware;
 
 
+import br.com.guilherme_momolli.controle_patrimonial.model.enums.Componente;
 import br.com.guilherme_momolli.controle_patrimonial.repository.HardwareRepository;
 
 
@@ -60,15 +61,20 @@ public class HardwareService {
 
     }
 
-    public ResponseEntity<Hardware> criarHardware(@RequestBody Hardware hardware){
+    public ResponseEntity<Hardware> criarHardware(@RequestBody Hardware hardware) {
         try {
+            if (hardware.getComponente() == Componente.GABINETE && (hardware.getCodigoPatrimonial() == null || hardware.getCodigoPatrimonial().isEmpty())) {
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            }
+
             Hardware saveHardware = hardwareRepository.save(hardware);
             return new ResponseEntity<>(saveHardware, HttpStatus.CREATED);
-        }catch (Exception exception){
+        } catch (Exception exception) {
             System.out.println(exception.getMessage());
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
+
 
 
     public ResponseEntity<Hardware> atualizarHardware(@PathVariable Long id, @RequestBody Hardware hardware){
@@ -76,7 +82,7 @@ public class HardwareService {
             Optional<Hardware> hardwareAtualizar = hardwareRepository.findById(id);
             Hardware hardwareParaAtualizar = hardwareAtualizar.get();
             hardwareParaAtualizar.setCodigoPatrimonial(hardware.getCodigoPatrimonial());
-            hardwareParaAtualizar.setComponente(hardware.getComponente());
+            //hardwareParaAtualizar.setComponente(hardware.getComponente());
             hardwareParaAtualizar.setFabricante(hardware.getFabricante());
             hardwareParaAtualizar.setModelo(hardware.getFabricante());
             hardwareParaAtualizar.setNumeroSerial(hardware.getNumeroSerial());
@@ -85,6 +91,7 @@ public class HardwareService {
             hardwareParaAtualizar.setPrecoTotal(hardware.getPrecoTotal());
             hardwareParaAtualizar.setDataFabricacao(hardware.getDataFabricacao());
             hardwareParaAtualizar.setCapacidadeArmazenamento(hardware.getCapacidadeArmazenamento());
+            //hardwareParaAtualizar.setEstatus(hardware.getEstatus());
 
             Hardware update = hardwareRepository.save(hardwareParaAtualizar);
             return new ResponseEntity<>(update, HttpStatus.OK);

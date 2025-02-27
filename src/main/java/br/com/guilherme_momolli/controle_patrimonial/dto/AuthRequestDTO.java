@@ -1,11 +1,11 @@
 package br.com.guilherme_momolli.controle_patrimonial.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class LoginRequestDTO {
+@Getter
+@Setter
+public class AuthRequestDTO {
     private String email;
     private String senha;
-    public LoginRequestDTO() {
-    }
 }

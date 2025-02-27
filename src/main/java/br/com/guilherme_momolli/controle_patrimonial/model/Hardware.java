@@ -19,8 +19,9 @@ public class Hardware {
     @Column(name="codigo_patrimonial")
     private String codigoPatrimonial;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private Componente componente;
+
 
     @Column(name="numero_serial")
     private String numeroSerial;
@@ -31,33 +32,21 @@ public class Hardware {
 
     private String velocidade;
 
-    ///colocar o numero de série
     @Column(name="capacidade_armazenamento")
     private String capacidadeArmazenamento;
 
     @Column(name="data_fabricacao")
     private Timestamp dataFabricacao;
 
-   // private Timestamp data_compra;
-
-    //private Timestamp data_lancamento;
     @Column(name="preco_total")
     private Double precoTotal;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private Estatus estatus;
 
     @OneToOne
     @JoinColumn(name = "nota_fiscal_id", referencedColumnName = "id")
     private NotaFiscal notaFiscal;
-
-
-   
-
-    public Hardware(){
-
-    }
-    
 
 
 }

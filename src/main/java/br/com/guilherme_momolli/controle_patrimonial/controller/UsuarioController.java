@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/usuario")
 public class UsuarioController{
@@ -45,7 +46,7 @@ public class UsuarioController{
         boolean autenticado = usuarioService.autenticar(email, senha);
 
         if (autenticado) {
-            return ResponseEntity.ok("Login bem-sucedido!");
+            return ResponseEntity.status(HttpStatus.OK).body("Login bem-sucedido!");
         }
         else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");

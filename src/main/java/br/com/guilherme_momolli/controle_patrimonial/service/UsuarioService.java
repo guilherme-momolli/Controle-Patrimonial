@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,12 +24,11 @@ import java.util.Optional;
 @Service
 public class UsuarioService {
 
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
+    //private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @Autowired
     private UsuarioRepository usuarioRepository;
-
-
 
     public ResponseEntity<List<Usuario>> listarUsuario(){
         try{
@@ -57,6 +57,8 @@ public class UsuarioService {
             usuario.setEmail(cadastroRequestDTO.getEmail());
             usuario.setSenha(passwordEncoder.encode(cadastroRequestDTO.getSenha()));
 
+
+
             usuarioRepository.save(usuario);
 
             return new ResponseEntity<>(usuario, HttpStatus.CREATED);
@@ -72,10 +74,10 @@ public class UsuarioService {
             String email1 = loginRequestDTO.getEmail();
             String senha = loginRequestDTO.getSenha();
 
-            Usuario usuario = usuarioRepository.findByEmail(email1);
+            Optional<Usuario> usuario = usuarioRepository.findByEmail(email1);
 
 
-            if (passwordEncoder.matches(senha, usuario.getSenha())) {
+            if (passwordEncoder.matches(senha, usuario.get().getSenha())) {
                 return ResponseEntity.ok("Login bem-sucedido!");
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
@@ -115,8 +117,8 @@ public class UsuarioService {
     }
 
     public boolean autenticar(String email, String senha) {
-        Usuario usuario = usuarioRepository.findByEmail(email);
-        if (usuario != null && passwordEncoder.matches(senha, usuario.getSenha())) {
+        Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
+        if (usuario != null && passwordEncoder.matches(senha, usuario.get().getSenha())) {
             return true;
         }
         return false;
