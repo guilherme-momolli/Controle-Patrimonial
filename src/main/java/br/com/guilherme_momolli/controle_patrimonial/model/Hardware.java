@@ -22,7 +22,6 @@ public class Hardware {
     @Enumerated(EnumType.STRING)
     private Componente componente;
 
-
     @Column(name="numero_serial")
     private String numeroSerial;
 

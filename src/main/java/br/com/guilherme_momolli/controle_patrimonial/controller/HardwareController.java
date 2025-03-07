@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -46,12 +47,17 @@ public class HardwareController {
         return hardwareService.criarHardware(hardware);
     }
 
+    @GetMapping("/list/agrupado")
+    public ResponseEntity<Map<String, List<Hardware>>> listarAgrupado() {
+        return hardwareService.listarHardwareAgrupado();
+    }
+
     @PutMapping("/update/{id}")
     public ResponseEntity<Hardware> updateHardware(@PathVariable Long id, @RequestBody Hardware hardware) {
         return  hardwareService.atualizarHardware(id, hardware);
     }
 
-    @DeleteMapping("delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Hardware> deleterHardware(@PathVariable Long id) {
         return hardwareService.deletarHardware(id);
     }

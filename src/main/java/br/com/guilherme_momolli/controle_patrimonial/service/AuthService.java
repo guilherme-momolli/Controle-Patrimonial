@@ -21,9 +21,10 @@ public class AuthService {
     private  JwtUtil jwtUtil;
     private PasswordEncoder passwordEncoder;
 
-    public AuthService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
 
@@ -31,6 +32,7 @@ public class AuthService {
         Optional<Usuario> usuario = usuarioRepository.findByEmail(request.getEmail());
 
         if (usuario.isPresent() && passwordEncoder.matches(request.getSenha(), usuario.get().getSenha())) {
+            //String token = jwtUtil.generateToken(request.getEmail());
             String token = "TOKEN_GERADO";
             return new AuthResponseDTO(token);
         }

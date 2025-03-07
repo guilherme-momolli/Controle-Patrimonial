@@ -5,7 +5,8 @@ import br.com.guilherme_momolli.controle_patrimonial.model.Hardware;
 
 import br.com.guilherme_momolli.controle_patrimonial.model.enums.Componente;
 import br.com.guilherme_momolli.controle_patrimonial.repository.HardwareRepository;
-
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -75,7 +76,20 @@ public class HardwareService {
         }
     }
 
+    public ResponseEntity<Map<String, List<Hardware>>> listarHardwareAgrupado() {
+        try {
+            List<Hardware> hardwares = hardwareRepository.findAll();
 
+            // Agrupa os hardwares pelo código patrimonial
+            Map<String, List<Hardware>> agrupados = hardwares.stream()
+                    .collect(Collectors.groupingBy(Hardware::getCodigoPatrimonial));
+
+            return new ResponseEntity<>(agrupados, HttpStatus.OK);
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     public ResponseEntity<Hardware> atualizarHardware(@PathVariable Long id, @RequestBody Hardware hardware){
         try{
