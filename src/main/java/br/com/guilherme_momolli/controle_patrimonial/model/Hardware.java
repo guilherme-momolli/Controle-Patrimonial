@@ -43,9 +43,12 @@ public class Hardware {
     @Enumerated(EnumType.STRING)
     private Estatus estatus;
 
+    private Double voltagem;
+
     @OneToOne
     @JoinColumn(name = "nota_fiscal_id", referencedColumnName = "id")
     private NotaFiscal notaFiscal;
 
-
+    @Column(name = "imagem_url")
+    private String imagemUrl;
 }

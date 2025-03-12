@@ -2,31 +2,20 @@ package br.com.guilherme_momolli.controle_patrimonial.controller;
 
 import br.com.guilherme_momolli.controle_patrimonial.model.Hardware;
 import br.com.guilherme_momolli.controle_patrimonial.service.HardwareService;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Map;
 
 @CrossOrigin
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/hardware")
 public class HardwareController {
 
-
-    private HardwareService hardwareService;
-
-    @Autowired
-    public HardwareController(HardwareService hardwareService) {
-        this.hardwareService = hardwareService;
-    }
-
-    @GetMapping("/hello")
-    public String helloWorld() {
-        return "Olá, mundo!";
-    }
+    private final HardwareService hardwareService;
 
     @GetMapping("/list")
     public ResponseEntity<List<Hardware>> getAllHardwares() {
@@ -39,12 +28,24 @@ public class HardwareController {
     }
 
     @GetMapping("/list/patrimonio/{codigoPatrimonial}")
-    public ResponseEntity<List<Hardware>> getHardwareByCodigoPatrimonial(@PathVariable String codigoPatrimonial){
+    public ResponseEntity<List<Hardware>> getHardwareByCodigoPatrimonial(@PathVariable String codigoPatrimonial) {
         return hardwareService.getByCodigoPatrimonial(codigoPatrimonial);
     }
-    @PostMapping("/create")
-    public ResponseEntity<Hardware> criarHardware(@RequestBody Hardware hardware) {
-        return hardwareService.criarHardware(hardware);
+
+    @PostMapping(value = "/create", consumes = {"multipart/form-data"})
+    public ResponseEntity<Hardware> criarHardware(@RequestPart("hardware") Hardware hardware, @RequestPart(value = "imagem", required = false) MultipartFile imagem
+    ) {
+        return hardwareService.criarHardware(hardware, imagem);
+    }
+
+    @GetMapping("/{fileName}/imagem")
+    public ResponseEntity<byte[]> getImagem(@PathVariable String fileName) {
+        return hardwareService.getImagem(fileName);
+    }
+
+    @PostMapping("/{id}/upload-imagem")
+    public ResponseEntity<String> uploadImagem(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        return hardwareService.uploadImagem(id, file);
     }
 
     @GetMapping("/list/agrupado")
@@ -54,11 +55,11 @@ public class HardwareController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Hardware> updateHardware(@PathVariable Long id, @RequestBody Hardware hardware) {
-        return  hardwareService.atualizarHardware(id, hardware);
+        return hardwareService.atualizarHardware(id, hardware);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Hardware> deleterHardware(@PathVariable Long id) {
+    public ResponseEntity<Void> deletarHardware(@PathVariable Long id) {
         return hardwareService.deletarHardware(id);
     }
 }
