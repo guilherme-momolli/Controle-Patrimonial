@@ -12,7 +12,8 @@ public enum Componente {
     FONTE_ALIMENTACAO("Fonte de alimentação"),
     PLACA_WIFI("Placa Wi-Fi"),
     COOLER("Cooler"),
-    GABINETE("Gabinete");
+    GABINETE("Gabinete"),
+    NOTEBOOK("Notebook");
 
     private final String descricao;
 
