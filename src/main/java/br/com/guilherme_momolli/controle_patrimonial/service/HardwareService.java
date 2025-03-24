@@ -3,6 +3,8 @@ package br.com.guilherme_momolli.controle_patrimonial.service;
 import br.com.guilherme_momolli.controle_patrimonial.model.Hardware;
 import br.com.guilherme_momolli.controle_patrimonial.model.enums.Componente;
 import br.com.guilherme_momolli.controle_patrimonial.repository.HardwareRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -14,7 +16,7 @@ import java.util.stream.Collectors;
 @Service
 public class HardwareService {
 
-    private static final Set<String> EXTENSOES_PERMITIDAS = Set.of("jpg", "jpeg", "png");
+//    private static final Set<String> EXTENSOES_PERMITIDAS = Set.of("jpg", "jpeg", "png");
 
     private final HardwareRepository hardwareRepository;
     private final FileStorageService fileStorageService;
@@ -24,10 +26,10 @@ public class HardwareService {
         this.fileStorageService = fileStorageService;
     }
 
-    private boolean isImagemValida(MultipartFile imagem) {
-        String fileExtension = getFileExtension(imagem.getOriginalFilename());
-        return EXTENSOES_PERMITIDAS.contains(fileExtension);
-    }
+//    private boolean isImagemValida(MultipartFile imagem) {
+//        String fileExtension = getFileExtension(imagem.getOriginalFilename());
+//        return EXTENSOES_PERMITIDAS.contains(fileExtension);
+//    }
 
     private String getFileExtension(String fileName) {
         if (fileName == null || fileName.isEmpty()) {
@@ -36,19 +38,16 @@ public class HardwareService {
         return fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
     }
 
-    public ResponseEntity<Hardware> criarHardware(Hardware hardware, MultipartFile imagem) {
+    public ResponseEntity<Hardware> criarHardware(Hardware hardware, MultipartFile file) {
         try {
             if (hardware.getComponente() == Componente.GABINETE
                     && (hardware.getCodigoPatrimonial() == null || hardware.getCodigoPatrimonial().isEmpty())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
             }
 
-            if (imagem != null && !imagem.isEmpty()) {
-
-                String fileName = fileStorageService.storeFile(imagem);
-
-                String imagemUrl = "/path/to/images/" + fileName;
-
+            if (file != null && !file.isEmpty()) {
+                String fileName = fileStorageService.storeFile(file);
+                String imagemUrl = "/uploads/" + fileName; // Certifique-se de definir corretamente a URL da imagem
                 hardware.setImagemUrl(imagemUrl);
             }
 
@@ -60,6 +59,8 @@ public class HardwareService {
     }
 
 
+
+    @Transactional
     public ResponseEntity<Hardware> atualizarHardware(Long id, Hardware hardware, MultipartFile imagem) {
         try {
             Hardware existingHardware = hardwareRepository.findById(id)
@@ -77,11 +78,8 @@ public class HardwareService {
             existingHardware.setEstatus(hardware.getEstatus());
 
             if (imagem != null && !imagem.isEmpty()) {
-                if (!isImagemValida(imagem)) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-                }
                 String fileName = fileStorageService.storeFile(imagem);
-                existingHardware.setImagemUrl(fileName);
+                existingHardware.setImagemUrl("/uploads/" + fileName);
             }
 
             Hardware updatedHardware = hardwareRepository.save(existingHardware);
@@ -90,6 +88,7 @@ public class HardwareService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
 
     public ResponseEntity<byte[]> getImagem(String fileName) {
         try {

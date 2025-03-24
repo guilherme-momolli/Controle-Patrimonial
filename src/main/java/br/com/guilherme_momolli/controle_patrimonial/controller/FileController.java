@@ -24,8 +24,13 @@ public class FileController {
     private FileStorageService fileStorageService;
 
     private static final Logger logger = Logger.getLogger(FileController.class.getName());
-    private static final List<String> ALLOWED_FILE_TYPES = Arrays.asList("image/jpeg", "image/png", "application/pdf");
 
+    private static final List<String> ALLOWED_FILE_TYPES = Arrays.asList("image/jpeg",
+            "image/png",
+            "application/pdf",
+            "image/gif",
+            "image/tiff",
+            "image/bmp");
 
     @GetMapping("/downloadFile/{fileName:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
@@ -41,11 +46,11 @@ public class FileController {
         if (contentType == null) {
             contentType = "application/octet-stream";
         }
+
         return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
-                    .header("Content-Disposition", "attachment; filename=\""
-                            + resource.getFilename()
-                            + "\"")
-                    .body(resource);
+                .header("Content-Disposition", "attachment; filename=\""
+                        + resource.getFilename()
+                        + "\"").body(resource);
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, path = "/uploadFile")
@@ -69,6 +74,7 @@ public class FileController {
         }
         return responses;
     }
+
 
 }
 

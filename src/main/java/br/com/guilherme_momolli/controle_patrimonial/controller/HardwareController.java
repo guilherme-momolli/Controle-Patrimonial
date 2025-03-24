@@ -3,7 +3,11 @@ package br.com.guilherme_momolli.controle_patrimonial.controller;
 import br.com.guilherme_momolli.controle_patrimonial.model.Hardware;
 import br.com.guilherme_momolli.controle_patrimonial.service.FileStorageService;
 import br.com.guilherme_momolli.controle_patrimonial.service.HardwareService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,19 +46,28 @@ public class HardwareController {
         return hardwareService.getByCodigoPatrimonial(codigoPatrimonial);
     }
 
-    @PostMapping(value = "/create", consumes = {"multipart/form-data"})
+    @PostMapping(path = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Hardware> criarHardware(
-            @ModelAttribute Hardware hardware,
-            @RequestPart(value = "imagem", required = false) MultipartFile imagem) {
-        return hardwareService.criarHardware(hardware, imagem);
+            @RequestPart("hardware") String hardwareJson,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            Hardware hardware = objectMapper.readValue(hardwareJson, Hardware.class);
+            return hardwareService.criarHardware(hardware, file);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 
-    @PutMapping(value = "/update/{id}", consumes = {"multipart/form-data"})
-    public ResponseEntity<Hardware> updateHardware(
-            @PathVariable Long id,
-            @ModelAttribute Hardware hardware,
-            @RequestPart(value = "imagem", required = false) MultipartFile imagem) {
-        return hardwareService.atualizarHardware(id, hardware, imagem);
+    @PutMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Hardware> updateHardware(@PathVariable Long id, @ModelAttribute String hardwareJson, @RequestPart(value = "file", required = false) MultipartFile file) {
+        try {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Hardware hardware = objectMapper.readValue(hardwareJson, Hardware.class);
+        return hardwareService.criarHardware(hardware, file);
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 
     @DeleteMapping("/delete/{id}")

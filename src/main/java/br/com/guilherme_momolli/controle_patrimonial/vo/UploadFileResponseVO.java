@@ -14,7 +14,6 @@ public class UploadFileResponseVO implements Serializable {
 
     private long size;
 
-
     public UploadFileResponseVO() {
     }
 
@@ -23,6 +22,14 @@ public class UploadFileResponseVO implements Serializable {
         this.fileDownloadUri = fileDownloadUri;
         this.fileType = fileType;
         this.size = size;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public String getFileDownloadUri() {
