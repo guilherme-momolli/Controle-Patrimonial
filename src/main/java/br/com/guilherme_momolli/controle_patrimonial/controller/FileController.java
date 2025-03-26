@@ -4,12 +4,15 @@ import br.com.guilherme_momolli.controle_patrimonial.vo.UploadFileResponseVO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -76,23 +79,25 @@ public class FileController {
     }
 
     @GetMapping("/getFile/{fileName:.+}")
-    public ResponseEntity<Resource> getFile(@PathVariable String fileName, HttpServletRequest request) {
-        Resource resource = fileStorageService.loadFileAsResource(fileName);
-
-        String contentType;
+    public ResponseEntity<byte[]> getImagem(@PathVariable String fileName) {
         try {
-            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+            byte[] imageBytes = fileStorageService.getImagem(fileName);
+            Resource resource = fileStorageService.loadFileAsResource(fileName);
+
+            String contentType = Files.probeContentType(resource.getFile().toPath());
             if (contentType == null) {
                 contentType = "application/octet-stream";
             }
-        } catch (Exception ex) {
-            contentType = "application/octet-stream";
-        }
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .body(resource);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(contentType));
+
+            return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
+
 
 }
 

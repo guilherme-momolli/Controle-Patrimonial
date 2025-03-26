@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.UUID;
 
 @Service
 public class FileStorageService {
@@ -35,27 +36,26 @@ public class FileStorageService {
     }
 
     public String storeFile(MultipartFile file) {
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());  // Limpeza do nome do arquivo
+        String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
         try {
-            if (fileName.contains("..")) {  // Verificação de nome de arquivo inválido
-                throw new FileStorageException("O nome do arquivo contém uma sequência de caminho inválida " + fileName);
+            if (originalFileName.contains("..")) {
+                throw new FileStorageException("O nome do arquivo contém uma sequência de caminho inválida " + originalFileName);
             }
 
+            String fileName = UUID.randomUUID().toString() + "_" + originalFileName;
 
-            // Resolve o caminho completo do arquivo e o copia
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);  // Substitui se o arquivo já existir
+            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
             return fileName;
         } catch (Exception ex) {
-            throw new FileStorageException("Não foi possível armazenar o arquivo " + fileName + ". Tente novamente!", ex);
+            throw new FileStorageException("Não foi possível armazenar o arquivo " + originalFileName + ". Tente novamente!", ex);
         }
     }
 
     public byte[] getImagem(String fileName) {
-        // Recupera o arquivo como bytes
-        Path targetLocation = this.fileStorageLocation.resolve(fileName);
         try {
+            Path targetLocation = this.fileStorageLocation.resolve(fileName);
             return Files.readAllBytes(targetLocation);
         } catch (Exception ex) {
             throw new FileStorageException("Não foi possível recuperar o arquivo " + fileName + ". Tente novamente!", ex);
@@ -63,7 +63,6 @@ public class FileStorageService {
     }
 
     public Resource loadFileAsResource(String fileName) {
-        // Carrega o arquivo como um recurso (útil para download ou exibição)
         try {
             Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
             Resource resource = new UrlResource(filePath.toUri());

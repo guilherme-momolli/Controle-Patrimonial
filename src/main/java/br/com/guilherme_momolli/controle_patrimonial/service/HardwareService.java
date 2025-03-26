@@ -3,20 +3,18 @@ package br.com.guilherme_momolli.controle_patrimonial.service;
 import br.com.guilherme_momolli.controle_patrimonial.model.Hardware;
 import br.com.guilherme_momolli.controle_patrimonial.model.enums.Componente;
 import br.com.guilherme_momolli.controle_patrimonial.repository.HardwareRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jakarta.transaction.Transactional;
-import org.springframework.core.io.Resource;
+
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import java.nio.file.*;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class HardwareService {
-
-//    private static final Set<String> EXTENSOES_PERMITIDAS = Set.of("jpg", "jpeg", "png");
 
     private final HardwareRepository hardwareRepository;
     private final FileStorageService fileStorageService;
@@ -26,31 +24,16 @@ public class HardwareService {
         this.fileStorageService = fileStorageService;
     }
 
-//    private boolean isImagemValida(MultipartFile imagem) {
-//        String fileExtension = getFileExtension(imagem.getOriginalFilename());
-//        return EXTENSOES_PERMITIDAS.contains(fileExtension);
-//    }
-
-    private String getFileExtension(String fileName) {
-        if (fileName == null || fileName.isEmpty()) {
-            return "";
-        }
-        return fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-    }
-
-    public ResponseEntity<Hardware> criarHardware(Hardware hardware, MultipartFile file) {
+    public ResponseEntity<Hardware> createHardware(Hardware hardware, MultipartFile file) {
         try {
             if (hardware.getComponente() == Componente.GABINETE
                     && (hardware.getCodigoPatrimonial() == null || hardware.getCodigoPatrimonial().isEmpty())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
             }
-
             if (file != null && !file.isEmpty()) {
-                String fileName = fileStorageService.storeFile(file);
-                String imagemUrl = "/uploads/" + fileName; // Certifique-se de definir corretamente a URL da imagem
+                String imagemUrl = fileStorageService.storeFile(file);
                 hardware.setImagemUrl(imagemUrl);
             }
-
             Hardware savedHardware = hardwareRepository.save(hardware);
             return new ResponseEntity<>(savedHardware, HttpStatus.CREATED);
         } catch (Exception e) {
@@ -58,13 +41,10 @@ public class HardwareService {
         }
     }
 
-
-
     @Transactional
-    public ResponseEntity<Hardware> atualizarHardware(Long id, Hardware hardware, MultipartFile imagem) {
+    public ResponseEntity<Hardware> updateHardware(Long id, Hardware hardware, MultipartFile file) {
         try {
-            Hardware existingHardware = hardwareRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Hardware não encontrado"));
+            Hardware existingHardware = hardwareRepository.findById(id).orElseThrow(() -> new RuntimeException("Hardware não encontrado"));
 
             existingHardware.setCodigoPatrimonial(hardware.getCodigoPatrimonial());
             existingHardware.setFabricante(hardware.getFabricante());
@@ -77,11 +57,10 @@ public class HardwareService {
             existingHardware.setComponente(hardware.getComponente());
             existingHardware.setEstatus(hardware.getEstatus());
 
-            if (imagem != null && !imagem.isEmpty()) {
-                String fileName = fileStorageService.storeFile(imagem);
-                existingHardware.setImagemUrl("/uploads/" + fileName);
+            if (file != null && !file.isEmpty()) {
+                String fileName = fileStorageService.storeFile(file);
+                existingHardware.setImagemUrl(fileName);
             }
-
             Hardware updatedHardware = hardwareRepository.save(existingHardware);
             return new ResponseEntity<>(updatedHardware, HttpStatus.OK);
         } catch (Exception e) {
@@ -89,25 +68,7 @@ public class HardwareService {
         }
     }
 
-
-    public ResponseEntity<byte[]> getImagem(String fileName) {
-        try {
-            byte[] imageBytes = fileStorageService.getImagem(fileName);
-            Resource resource = fileStorageService.loadFileAsResource(fileName);
-            String contentType = Files.probeContentType(resource.getFile().toPath());
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.parseMediaType(contentType));
-
-            return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-
-
-    public ResponseEntity<List<Hardware>> listarHardware() {
+    public ResponseEntity<List<Hardware>> listHardware() {
         try {
             return new ResponseEntity<>(hardwareRepository.findAll(), HttpStatus.OK);
         } catch (Exception e) {
@@ -139,7 +100,7 @@ public class HardwareService {
         }
     }
 
-    public ResponseEntity<Void> deletarHardware(Long id) {
+    public ResponseEntity<Void> deleteHardware(Long id) {
         if (!hardwareRepository.existsById(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
