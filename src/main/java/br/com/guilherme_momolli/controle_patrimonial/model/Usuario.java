@@ -1,11 +1,15 @@
 package br.com.guilherme_momolli.controle_patrimonial.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
+
+import java.util.List;
 
 @Data
 @Entity
-@Table(name="usuario")
+@Table(name = "usuario")
 public class Usuario {
 
     @Id
@@ -14,7 +18,7 @@ public class Usuario {
 
     private String nome;
 
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
     private String senha;

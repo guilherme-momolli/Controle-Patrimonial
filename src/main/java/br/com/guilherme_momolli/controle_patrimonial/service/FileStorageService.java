@@ -6,10 +6,6 @@ import br.com.guilherme_momolli.controle_patrimonial.excepitions.file_storage.My
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,7 +25,7 @@ public class FileStorageService {
         this.fileStorageLocation = Path.of(fileStorageConfig.getUploadDir())
                 .toAbsolutePath().normalize();
         try {
-            Files.createDirectories(this.fileStorageLocation);  // Criação do diretório onde os arquivos serão armazenados
+            Files.createDirectories(this.fileStorageLocation);
         } catch (Exception ex) {
             throw new FileStorageException("Não foi possível criar o diretório onde os arquivos serão armazenados.", ex);
         }
@@ -73,6 +69,15 @@ public class FileStorageService {
             }
         } catch (Exception ex) {
             throw new MyFileNotFoyndException("Arquivo não encontrado " + fileName, ex);
+        }
+    }
+
+    public void deleteFile(String fileName) {
+        try {
+            Path filePath = this.fileStorageLocation.resolve(fileName);
+            Files.deleteIfExists(filePath);
+        } catch (Exception ex) {
+            throw new FileStorageException("Erro ao excluir o arquivo: " + fileName, ex);
         }
     }
 

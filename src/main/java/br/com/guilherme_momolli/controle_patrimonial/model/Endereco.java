@@ -1,5 +1,7 @@
 package br.com.guilherme_momolli.controle_patrimonial.model;
 
+import br.com.guilherme_momolli.controle_patrimonial.model.enums.Pais;
+import br.com.guilherme_momolli.controle_patrimonial.model.enums.UF;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -22,8 +24,9 @@ public class Endereco {
 
     private String municipio;
 
-    private String uf;
+    @Enumerated(EnumType.STRING)
+    private UF uf;
 
-    private String pais;
-
+    @Enumerated(EnumType.STRING)
+    private Pais pais;
 }

@@ -4,32 +4,33 @@ import br.com.guilherme_momolli.controle_patrimonial.dto.AuthRequestDTO;
 import br.com.guilherme_momolli.controle_patrimonial.dto.AuthResponseDTO;
 import br.com.guilherme_momolli.controle_patrimonial.model.Usuario;
 import br.com.guilherme_momolli.controle_patrimonial.repository.UsuarioRepository;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
+@RequiredArgsConstructor
 @Service
 public class AuthService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
     private final UsuarioRepository usuarioRepository;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
-        this.usuarioRepository = usuarioRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtUtil = jwtUtil;
-    }
 
     public AuthResponseDTO authenticate(AuthRequestDTO request) {
-        Optional<Usuario> usuario = usuarioRepository.findByEmail(request.getEmail());
+        Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new BadCredentialsException("Credenciais inválidas"));
 
-        if (usuario.isPresent() && passwordEncoder.matches(request.getSenha(), usuario.get().getSenha())) {
-            String token = jwtUtil.generateToken(request.getEmail());
-            return new AuthResponseDTO(token);
+        if (!passwordEncoder.matches(request.getSenha(), usuario.getSenha())) {
+            logger.warn("Falha na autenticação: Credenciais inválidas.");
+            throw new BadCredentialsException("Credenciais inválidas");
         }
 
-        throw new RuntimeException("Credenciais inválidas");
+        String token = jwtUtil.generateToken(usuario.getEmail());
+        return new AuthResponseDTO(token);
     }
 }

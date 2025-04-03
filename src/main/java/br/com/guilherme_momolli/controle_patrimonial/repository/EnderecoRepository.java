@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface EnderecoRepository extends JpaRepository<Endereco, Long> {
         ArrayList<Endereco> findAll();
-        Endereco save(Endereco endereco);
         Optional<Endereco> findById(Long id);
+
 }
 

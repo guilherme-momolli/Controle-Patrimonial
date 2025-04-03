@@ -1,88 +1,106 @@
-//package br.com.guilherme_momolli.controle_patrimonial.service;
-//
-//import br.com.guilherme_momolli.controle_patrimonial.model.Endereco;
-//import br.com.guilherme_momolli.controle_patrimonial.model.Instituicao;
-//
-//import br.com.guilherme_momolli.controle_patrimonial.repository.InstituicaoRepository;
-//
-//import org.springframework.beans.factory.annotation.Autowired;
-//
-//import org.springframework.http.HttpStatus;
-//import org.springframework.http.ResponseEntity;
-//
-//import org.springframework.stereotype.Service;
-//
-//import org.springframework.web.bind.annotation.PathVariable;
-//import org.springframework.web.bind.annotation.RequestBody;
-//
-//import java.util.List;
-//import java.util.Optional;
-//
-//@Service
-//public class InstituicaoService {
-//
-//    @Autowired
-//    private InstituicaoRepository instituicaoRepository;
-//
-//    public InstituicaoService(InstituicaoRepository instiuicaoRepository){
-//        this.instituicaoRepository = instituicaoRepository;
-//    }
-//
-//    public ResponseEntity<List<Instituicao>> listarInstituicao(){
-//        try{
-//            return new ResponseEntity(instituicaoRepository.findAll(), HttpStatus.OK);
-//        }
-//        catch(Exception exception){
-//            System.out.println(exception.getMessage());
-//            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-//        }
-//    }
-//
-//    public ResponseEntity<Instituicao> getById(Long id) {
-//        try {
-//            Optional<Instituicao> instituicao = instituicaoRepository.findById(id);
-//            return instituicao.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
-//        } catch (Exception exception) {
-//            System.out.println(exception.getMessage());
-//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
-//
-//    public ResponseEntity<Instituicao> criarInstituicao(@RequestBody Instituicao instituicao){
-//        try {
-//            Instituicao saveInstituicao = instituicaoRepository.save(instituicao);
-//            return new ResponseEntity<>(saveInstituicao, HttpStatus.CREATED);
-//        }catch (Exception exception){
-//            System.out.println(exception.getMessage());
-//            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-//        }
-//    }
-//
-//    public ResponseEntity<Instituicao> atualizarInstituicao(@PathVariable Long id, @RequestBody Instituicao instituicao){
-//        try{
-//            Optional<Instituicao> instituicaoAtualizar = instituicaoRepository.findById(id);
-//            Instituicao instituicaoParaAtualizar = instituicaoAtualizar.get();
-//            instituicaoParaAtualizar.setNome(instituicao.getNome());
-//            instituicaoParaAtualizar.setEmail(instituicao.getEmail());
-//            instituicaoParaAtualizar.setSenha(instituicao.getSenha());
-//            instituicaoParaAtualizar.setCnpj(instituicao.getCnpj());
-//            instituicaoParaAtualizar.setEndereco_id(instituicao.getEndereco_id());
-//
-//            Instituicao update = instituicaoRepository.save(instituicaoParaAtualizar);
-//            return new ResponseEntity<>(update, HttpStatus.OK);
-//        }catch (Exception exception){
-//            System.out.println(exception.getMessage());
-//            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
-//
-//    public ResponseEntity<Instituicao> deletarInstituicao(@PathVariable Long id){
-//        try {
-//            instituicaoRepository.deleteById(id);
-//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//        }catch (Exception exception){
-//            System.out.println(exception.getMessage());
-//            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
-//}
+package br.com.guilherme_momolli.controle_patrimonial.service;
+
+import br.com.guilherme_momolli.controle_patrimonial.model.Endereco;
+import br.com.guilherme_momolli.controle_patrimonial.model.Instituicao;
+import br.com.guilherme_momolli.controle_patrimonial.model.Usuario;
+import br.com.guilherme_momolli.controle_patrimonial.model.UsuarioInstituicao;
+import br.com.guilherme_momolli.controle_patrimonial.model.enums.Privilegio;
+import br.com.guilherme_momolli.controle_patrimonial.repository.EnderecoRepository;
+import br.com.guilherme_momolli.controle_patrimonial.repository.InstituicaoRepository;
+import br.com.guilherme_momolli.controle_patrimonial.repository.UsuarioInstituicaoRepository;
+import br.com.guilherme_momolli.controle_patrimonial.repository.UsuarioRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class InstituicaoService {
+
+    private final InstituicaoRepository instituicaoRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final UsuarioInstituicaoRepository usuarioInstituicaoRepository;
+    private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private EnderecoRepository enderecoRepository;
+
+    public List<Instituicao> listInstituicoes() {
+        return instituicaoRepository.findAll();
+    }
+
+    public Instituicao getById(Long id) {
+        return instituicaoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Instituição não encontrada."));
+    }
+
+    @Transactional
+    public Instituicao createInstituicao(Instituicao instituicao, String senha) {
+        if (instituicaoRepository.findByEmail(instituicao.getEmail()).isPresent()) {
+            throw new RuntimeException("E-mail já está em uso.");
+        }
+
+        if (instituicao.getEndereco() != null && instituicao.getEndereco().getId() != null) {
+            Endereco endereco = enderecoRepository.findById(instituicao.getEndereco().getId())
+                    .orElseThrow(() -> new RuntimeException("Endereço não encontrado."));
+            instituicao.setEndereco(endereco);
+        }
+
+        Instituicao novaInstituicao = instituicaoRepository.save(instituicao);
+
+        Usuario usuario = new Usuario();
+        usuario.setNome(instituicao.getNomeFantasia());
+        usuario.setEmail(instituicao.getEmail());
+        usuario.setSenha(passwordEncoder.encode(senha));
+        usuario = usuarioRepository.save(usuario);
+
+        UsuarioInstituicao usuarioInstituicao = new UsuarioInstituicao();
+        usuarioInstituicao.setUsuario(usuario);
+        usuarioInstituicao.setInstituicao(novaInstituicao);
+        usuarioInstituicao.setPermissao(Privilegio.ADMIN_MASTER);
+        usuarioInstituicaoRepository.save(usuarioInstituicao);
+
+        return novaInstituicao;
+    }
+
+    @Transactional
+    public Instituicao updateInstituicao(Long id, Instituicao novaInstituicao, String senha) {
+        Instituicao instituicaoExistente = getById(id);
+
+        instituicaoExistente.setRazaoSocial(novaInstituicao.getRazaoSocial());
+        instituicaoExistente.setNomeFantasia(novaInstituicao.getNomeFantasia());
+        instituicaoExistente.setTipoInstituicao(novaInstituicao.getTipoInstituicao());
+        instituicaoExistente.setTelefoneFixo(novaInstituicao.getTelefoneFixo());
+        instituicaoExistente.setTelefoneCelular(novaInstituicao.getTelefoneCelular());
+
+        if (novaInstituicao.getEndereco() != null && novaInstituicao.getEndereco().getId() != null) {
+            Endereco endereco = enderecoRepository.findById(novaInstituicao.getEndereco().getId())
+                    .orElseThrow(() -> new RuntimeException("Endereço não encontrado."));
+            instituicaoExistente.setEndereco(endereco);
+        }
+
+        if (senha != null && !senha.isBlank()) {
+            Usuario usuario = usuarioRepository.findByEmail(instituicaoExistente.getEmail())
+                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+            usuario.setSenha(passwordEncoder.encode(senha));
+            usuarioRepository.save(usuario);
+        }
+
+        return instituicaoRepository.save(instituicaoExistente);
+    }
+
+    @Transactional
+    public void deleteInstituicao(Long id) {
+        Instituicao instituicao = getById(id);
+
+        List<UsuarioInstituicao> vinculos = usuarioInstituicaoRepository.findByInstituicaoId(id);
+        usuarioInstituicaoRepository.deleteAll(vinculos);
+
+        instituicaoRepository.delete(instituicao);
+    }
+}

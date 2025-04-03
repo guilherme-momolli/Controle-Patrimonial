@@ -1,10 +1,10 @@
 package br.com.guilherme_momolli.controle_patrimonial.controller;
 
 import br.com.guilherme_momolli.controle_patrimonial.dto.CadastroRequestDTO;
-import br.com.guilherme_momolli.controle_patrimonial.dto.LoginRequestDTO;
 import br.com.guilherme_momolli.controle_patrimonial.model.Usuario;
+import br.com.guilherme_momolli.controle_patrimonial.model.enums.Privilegio;
 import br.com.guilherme_momolli.controle_patrimonial.service.UsuarioService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,55 +13,59 @@ import java.util.List;
 
 @CrossOrigin
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/usuario")
-public class UsuarioController{
+public class UsuarioController {
 
-    @Autowired
-    private UsuarioService usuarioService;
-
-    @GetMapping("/hello")
-    public String helloWorld() {return "Olá, mundo!";}
+    private final UsuarioService usuarioService;
 
     @GetMapping("/list")
-    public ResponseEntity<List<Usuario>> getAllUsuarios() {
-        return usuarioService.listarUsuario();
+    public ResponseEntity<List<Usuario>> listarUsuarios() {
+        try{
+            usuarioService.listUsuarios();
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    @GetMapping("/list/{id}")
-    public ResponseEntity<Usuario> getUsuarioById(@PathVariable Long id){
-        return usuarioService.getById(id);
+    @GetMapping("/{id}")
+    public ResponseEntity<Usuario> getUsuarioById(@PathVariable Long id) {
+        try{
+            usuarioService.getById(id);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Usuario> criarUsuario(@RequestBody CadastroRequestDTO cadastroRequestDTO) {
-        return usuarioService.criarUsuario(cadastroRequestDTO);
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<String> loginUsuario(@RequestBody LoginRequestDTO loginRequestDTO){
-        //return usuarioService.loginUsuario(loginRequestDTO);
-        String email = loginRequestDTO.getEmail();
-        String senha = loginRequestDTO.getSenha();
-
-        boolean autenticado = usuarioService.autenticar(email, senha);
-
-        if (autenticado) {
-            return ResponseEntity.status(HttpStatus.OK).body("Login bem-sucedido!");
+    public ResponseEntity<Usuario> createUsuario(@RequestBody CadastroRequestDTO cadastroRequestDTO) {
+        try {
+           usuarioService.createUsuario(cadastroRequestDTO);
+           return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
-        }
-
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Usuario> updateUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
-        return  usuarioService.atualizarUsuario(id, usuario);
+        try{
+            usuarioService.updateUsuario(id, usuario);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
-    @DeleteMapping("delete/{id}")
-    public ResponseEntity<Usuario> deleterUsuario(@PathVariable Long id){
-        return usuarioService.deletarUsuario(id);
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteUsuario(@PathVariable Long id) {
+        try {
+            usuarioService.deleteUsuario(id);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
-
 }

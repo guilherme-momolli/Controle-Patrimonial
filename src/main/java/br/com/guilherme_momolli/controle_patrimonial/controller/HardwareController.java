@@ -1,7 +1,6 @@
 package br.com.guilherme_momolli.controle_patrimonial.controller;
 
 import br.com.guilherme_momolli.controle_patrimonial.model.Hardware;
-import br.com.guilherme_momolli.controle_patrimonial.service.FileStorageService;
 import br.com.guilherme_momolli.controle_patrimonial.service.HardwareService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @CrossOrigin
 @RestController
@@ -21,22 +21,24 @@ import java.util.Map;
 public class HardwareController {
 
     private final HardwareService hardwareService;
-
-    private final FileStorageService fileStorageService;
+    private final ObjectMapper objectMapper;
 
     @GetMapping("/list")
     public ResponseEntity<List<Hardware>> getAllHardwares() {
-        return hardwareService.listHardware();
+        List<Hardware> hardwares = hardwareService.listHardware();
+        return ResponseEntity.ok(hardwares);
     }
 
     @GetMapping("/list/{id}")
-    public ResponseEntity<Hardware> getHardwareById(@PathVariable Long id) {
-        return hardwareService.getById(id);
+    public ResponseEntity<Optional<Hardware>> getHardwareById(@PathVariable Long id) {
+        Optional <Hardware> hardware = hardwareService.getById(id);
+        return ResponseEntity.ok(hardware);
     }
 
-    @GetMapping("/list/patrimonio/{codigoPatrimonial}")
-    public ResponseEntity<List<Hardware>> getHardwareByCodigoPatrimonial(@PathVariable String codigoPatrimonial) {
-        return hardwareService.getByCodigoPatrimonial(codigoPatrimonial);
+    @GetMapping("/list/agrupado")
+    public ResponseEntity<Map<String, List<Hardware>>> listarAgrupado() {
+        Map<String, List<Hardware>> agrupados = hardwareService.listarHardwareAgrupado();
+        return ResponseEntity.ok(agrupados);
     }
 
     @PostMapping(path = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -44,35 +46,31 @@ public class HardwareController {
             @RequestPart("hardware") String hardwareJson,
             @RequestPart(value = "file", required = false) MultipartFile file) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
             Hardware hardware = objectMapper.readValue(hardwareJson, Hardware.class);
-            return hardwareService.createHardware(hardware, file);
+            Hardware savedHardware = hardwareService.createHardware(hardware, file);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedHardware);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
     @PutMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Hardware> updateHardware(
             @PathVariable Long id,
-            @RequestPart("hardware") String hardwareJson, // Correção aqui
+            @RequestPart("hardware") String hardwareJson,
             @RequestPart(value = "file", required = false) MultipartFile file) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
             Hardware hardware = objectMapper.readValue(hardwareJson, Hardware.class);
-            return hardwareService.updateHardware(id, hardware, file);
+            Hardware updatedHardware = hardwareService.updateHardware(id, hardware, file);
+            return ResponseEntity.ok(updatedHardware);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteHardware(@PathVariable Long id) {
-        return hardwareService.deleteHardware(id);
-    }
-
-    @GetMapping("/list/agrupado")
-    public ResponseEntity<Map<String, List<Hardware>>> listarAgrupado() {
-        return hardwareService.listarHardwareAgrupado();
+        hardwareService.deleteHardware(id);
+        return ResponseEntity.noContent().build();
     }
 }
