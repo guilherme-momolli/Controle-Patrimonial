@@ -45,7 +45,7 @@ public class UsuarioService {
         Instituicao instituicao = instituicaoRepository.findById(cadastroRequestDTO.getInstituicaoId())
                 .orElseThrow(() -> new ResourceNotFoundException("Instituição não encontrada"));
 
-        if (cadastroRequestDTO.getPrivilegio() == null) {
+        if (cadastroRequestDTO.getPermissao() == null) {
             throw new IllegalArgumentException("É obrigatório informar um privilégio para o usuário.");
         }
 
@@ -55,17 +55,19 @@ public class UsuarioService {
         usuario.setSenha(passwordEncoder.encode(cadastroRequestDTO.getSenha()));
         usuario = usuarioRepository.save(usuario);
 
-        // Criando relacionamento com a instituição e atribuindo a permissão informada
+        if (usuarioInstituicaoRepository.existsByUsuarioAndInstituicao(usuario, instituicao)) {
+            throw new IllegalArgumentException("Usuário já está vinculado a esta instituição.");
+        }
+
         UsuarioInstituicao usuarioInstituicao = new UsuarioInstituicao();
         usuarioInstituicao.setUsuario(usuario);
         usuarioInstituicao.setInstituicao(instituicao);
-        usuarioInstituicao.setPermissao(cadastroRequestDTO.getPrivilegio());
+        usuarioInstituicao.setPermissao(cadastroRequestDTO.getPermissao());
 
         usuarioInstituicaoRepository.save(usuarioInstituicao);
 
         return usuario;
     }
-
 
     @Transactional
     public Usuario updateUsuario(Long id, Usuario usuario) {
@@ -88,5 +90,48 @@ public class UsuarioService {
             throw new ResourceNotFoundException("Usuário não encontrado");
         }
         usuarioRepository.deleteById(id);
+    }
+
+    @Transactional
+    public UsuarioInstituicao vincularUsuarioAInstituicao(Long usuarioId, Long instituicaoId, Privilegio permissao) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        Instituicao instituicao = instituicaoRepository.findById(instituicaoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Instituição não encontrada"));
+
+        if (usuarioInstituicaoRepository.existsByUsuarioAndInstituicao(usuario, instituicao)) {
+            throw new IllegalArgumentException("O usuário já está vinculado a esta instituição.");
+        }
+
+        UsuarioInstituicao usuarioInstituicao = new UsuarioInstituicao();
+        usuarioInstituicao.setUsuario(usuario);
+        usuarioInstituicao.setInstituicao(instituicao);
+        usuarioInstituicao.setPermissao(permissao);
+
+        return usuarioInstituicaoRepository.save(usuarioInstituicao);
+    }
+
+    @Transactional
+    public void desvincularUsuarioDeInstituicao(Long usuarioId, Long instituicaoId) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        Instituicao instituicao = instituicaoRepository.findById(instituicaoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Instituição não encontrada"));
+
+        UsuarioInstituicao usuarioInstituicao = usuarioInstituicaoRepository
+                .findByUsuarioAndInstituicao(usuario, instituicao)
+                .orElseThrow(() -> new ResourceNotFoundException("Vínculo não encontrado"));
+
+        if (usuario.getEmail().equals(instituicao.getEmail())) {
+            throw new IllegalArgumentException("O e-mail da instituição não pode se desvincular.");
+        }
+
+        usuarioInstituicaoRepository.delete(usuarioInstituicao);
+    }
+
+    private boolean isEmailInstitucional(Usuario usuario, Instituicao instituicao) {
+        return usuario.getEmail().equalsIgnoreCase(instituicao.getEmail());
     }
 }

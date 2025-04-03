@@ -1,0 +1,21 @@
+<templateSet group="SpringBoot">
+    <template name="restmethod" value="@GetMapping(&quot;$ENDPOINT$&quot;)\npublic ResponseEntity&lt;$RETURN_TYPE$&gt; $METHOD_NAME$() {\n    return ResponseEntity.ok(new $RETURN_TYPE$());\n}" description="Cria um método REST no Spring Boot" toReformat="true" toShortenFQNames="true">
+        <variable name="ENDPOINT" expression="" defaultValue="&quot;/api&quot;" alwaysStopAt="true" />
+        <variable name="METHOD_NAME" expression="" defaultValue="&quot;getData&quot;" alwaysStopAt="true" />
+        <variable name="RETURN_TYPE" expression="" defaultValue="&quot;String&quot;" alwaysStopAt="true" />
+        <context>
+            <option name="JAVA_CODE" value="true" />
+        </context>
+    </template>
+    <template name="getByIdMethod" value="public $CLASS_NAME$ getById(Long id) {\n    return $REPO_NAME$.findById(id)\n            .orElseThrow(() -> new RuntimeException(&quot;$ENTITY_NAME$ não encontrada.&quot;));\n}"
+              description="Cria um método getById para buscar uma entidade no repositório"
+              toReformat="true" toShortenFQNames="true">
+        <variable name="CLASS_NAME" expression="" defaultValue="&quot;Instituicao&quot;" alwaysStopAt="true" />
+        <variable name="REPO_NAME" expression="" defaultValue="&quot;instituicaoRepository&quot;" alwaysStopAt="true" />
+        <variable name="ENTITY_NAME" expression="" defaultValue="&quot;Instituição&quot;" alwaysStopAt="true" />
+        <context>
+            <option name="JAVA_CODE" value="true" />
+        </context>
+    </template>
+</templateSet>
+

@@ -1,15 +1,15 @@
 package br.com.guilherme_momolli.controle_patrimonial.dto;
 
 import br.com.guilherme_momolli.controle_patrimonial.model.enums.Privilegio;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class CadastroRequestDTO {
-
-    private String nome;
-    private String email;
-    private String senha;
+@NoArgsConstructor
+@AllArgsConstructor
+public class VinculoRequestDTO {
+    private Long usuarioId;
     private Long instituicaoId;
     private Privilegio permissao;
-
 }

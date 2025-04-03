@@ -1,49 +1,49 @@
-package br.com.guilherme_momolli.controle_patrimonial.controller;
-
-import br.com.guilherme_momolli.controle_patrimonial.model.NotaFiscal;
-import br.com.guilherme_momolli.controle_patrimonial.service.NotaFiscalService;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-@CrossOrigin
-@RestController
-@RequestMapping("/nota_fiscal")
-public class NotaFiscalController {
-
-    @Autowired
-    private NotaFiscalService notaFiscalService;
-
-    @GetMapping("/hello")
-    public String helloWorld() {
-        return "Olá, mundo!";
-    }
-
-    @GetMapping("/list")
-    public ResponseEntity<List<NotaFiscal>> getAllNotasFiscais() {
-        return notaFiscalService.listarNotasFiscais();
-    }
-
-    @GetMapping("/list/{id}")
-    public ResponseEntity<NotaFiscal> getNotaFiscalById(@PathVariable Long id) {
-        return notaFiscalService.getById(id);
-    }
-
-    @PostMapping("/create")
-    public ResponseEntity<NotaFiscal> criarNotaFiscal(@RequestBody NotaFiscal notaFiscal) {
-        return notaFiscalService.criarNotaFiscal(notaFiscal);
-    }
-
-    @PutMapping("/update/{id}")
-    public ResponseEntity<NotaFiscal> updateNotaFiscal(@PathVariable Long id, @RequestBody NotaFiscal notaFiscal) {
-        return notaFiscalService.atualizarNotaFiscal(id, notaFiscal);
-    }
-
-    @DeleteMapping("delete/{id}")
-    public ResponseEntity<NotaFiscal> deleterNotaFiscal(@PathVariable Long id) {
-        return notaFiscalService.deletarNotaFiscal(id);
-   }
-}
+//package br.com.guilherme_momolli.controle_patrimonial.controller;
+//
+//import br.com.guilherme_momolli.controle_patrimonial.model.NotaFiscal;
+//import br.com.guilherme_momolli.controle_patrimonial.service.NotaFiscalService;
+//
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.http.ResponseEntity;
+//import org.springframework.web.bind.annotation.*;
+//
+//import java.util.List;
+//
+//@CrossOrigin
+//@RestController
+//@RequestMapping("/nota_fiscal")
+//public class NotaFiscalController {
+//
+//    @Autowired
+//    private NotaFiscalService notaFiscalService;
+//
+//    @GetMapping("/hello")
+//    public String helloWorld() {
+//        return "Olá, mundo!";
+//    }
+//
+//    @GetMapping("/list")
+//    public ResponseEntity<List<NotaFiscal>> getAllNotasFiscais() {
+//        return notaFiscalService.listarNotasFiscais();
+//    }
+//
+//    @GetMapping("/list/{id}")
+//    public ResponseEntity<NotaFiscal> getNotaFiscalById(@PathVariable Long id) {
+//        return notaFiscalService.getById(id);
+//    }
+//
+//    @PostMapping("/create")
+//    public ResponseEntity<NotaFiscal> criarNotaFiscal(@RequestBody NotaFiscal notaFiscal) {
+//        return notaFiscalService.criarNotaFiscal(notaFiscal);
+//    }
+//
+//    @PutMapping("/update/{id}")
+//    public ResponseEntity<NotaFiscal> updateNotaFiscal(@PathVariable Long id, @RequestBody NotaFiscal notaFiscal) {
+//        return notaFiscalService.atualizarNotaFiscal(id, notaFiscal);
+//    }
+//
+//    @DeleteMapping("delete/{id}")
+//    public ResponseEntity<NotaFiscal> deleterNotaFiscal(@PathVariable Long id) {
+//        return notaFiscalService.deletarNotaFiscal(id);
+//   }
+//}

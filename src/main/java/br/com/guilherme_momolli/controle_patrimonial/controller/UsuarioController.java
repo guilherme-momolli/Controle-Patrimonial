@@ -1,7 +1,9 @@
 package br.com.guilherme_momolli.controle_patrimonial.controller;
 
 import br.com.guilherme_momolli.controle_patrimonial.dto.CadastroRequestDTO;
+import br.com.guilherme_momolli.controle_patrimonial.dto.VinculoRequestDTO;
 import br.com.guilherme_momolli.controle_patrimonial.model.Usuario;
+import br.com.guilherme_momolli.controle_patrimonial.model.UsuarioInstituicao;
 import br.com.guilherme_momolli.controle_patrimonial.model.enums.Privilegio;
 import br.com.guilherme_momolli.controle_patrimonial.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +31,7 @@ public class UsuarioController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/list/{id}")
     public ResponseEntity<Usuario> getUsuarioById(@PathVariable Long id) {
         try{
             usuarioService.getById(id);
@@ -68,4 +70,24 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
+
+    @PostMapping("/vincular")
+    public ResponseEntity<UsuarioInstituicao> vincularUsuarioAInstituicao(@RequestBody VinculoRequestDTO request) {
+        UsuarioInstituicao usuarioInstituicao = usuarioService.vincularUsuarioAInstituicao(
+                request.getUsuarioId(),
+                request.getInstituicaoId(),
+                request.getPermissao()
+        );
+        return ResponseEntity.ok(usuarioInstituicao);
+    }
+
+    @DeleteMapping("/desvincular")
+    public ResponseEntity<Void> desvincularUsuarioDeInstituicao(@RequestParam Long usuarioId, @RequestParam Long instituicaoId) {
+        usuarioService.desvincularUsuarioDeInstituicao(usuarioId, instituicaoId);
+        return ResponseEntity.noContent().build();
+    }
+
+
+
 }
