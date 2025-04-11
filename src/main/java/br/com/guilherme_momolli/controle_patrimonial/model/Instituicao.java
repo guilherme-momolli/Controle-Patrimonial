@@ -24,13 +24,13 @@ public class Instituicao {
     @Column(unique = true)
     private String email;
 
-    @Column(name="telefone_fixo", unique = true, length = 20)
+    @Column(name="telefone_fixo", unique = true, length = 20, nullable = true)
     private String telefoneFixo;
 
-    @Column(name="telefone_celular", unique = true, length = 20)
+    @Column(name="telefone_celular", unique = true, length = 20, nullable = true)
     private String telefoneCelular;
 
-    @Column(unique = true, length = 14)
+    @Column(unique = true, length = 14, nullable = true)
     private String cnpj;
 
     @Enumerated(EnumType.STRING)

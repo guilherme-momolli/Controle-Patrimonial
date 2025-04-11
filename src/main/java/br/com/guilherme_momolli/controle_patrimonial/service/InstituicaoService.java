@@ -41,32 +41,46 @@ public class InstituicaoService {
 
     @Transactional
     public Instituicao createInstituicao(Instituicao instituicao, String senha) {
-        if (instituicaoRepository.findByEmail(instituicao.getEmail()).isPresent()) {
-            throw new RuntimeException("E-mail já está em uso.");
+        try {
+            System.out.println("Criando Instituição: " + instituicao.getNomeFantasia());
+
+            if (instituicaoRepository.findByEmail(instituicao.getEmail()).isPresent()) {
+                throw new RuntimeException("E-mail já está em uso.");
+            }
+
+            if (instituicao.getEndereco() != null) {
+                if (instituicao.getEndereco().getId() == null) {
+                    instituicao.setEndereco(enderecoRepository.save(instituicao.getEndereco()));
+                } else {
+                    instituicao.setEndereco(enderecoRepository.findById(instituicao.getEndereco().getId())
+                            .orElseThrow(() -> new RuntimeException("Endereço não encontrado.")));
+                }
+            }
+
+            Instituicao novaInstituicao = instituicaoRepository.save(instituicao);
+            System.out.println("Instituição salva com sucesso!");
+
+            Usuario usuario = new Usuario();
+            usuario.setNome(instituicao.getNomeFantasia());
+            usuario.setEmail(instituicao.getEmail());
+            usuario.setSenha(passwordEncoder.encode(senha));
+            usuario = usuarioRepository.save(usuario);
+            System.out.println("Usuário salvo com sucesso!");
+
+            UsuarioInstituicao usuarioInstituicao = new UsuarioInstituicao();
+            usuarioInstituicao.setUsuario(usuario);
+            usuarioInstituicao.setInstituicao(novaInstituicao);
+            usuarioInstituicao.setPermissao(Privilegio.ADMIN_MASTER);
+            usuarioInstituicaoRepository.save(usuarioInstituicao);
+            System.out.println("Usuário vinculado à instituição!");
+
+            return novaInstituicao;
+        } catch (Exception e) {
+            System.err.println("Erro ao criar instituição: " + e.getMessage());
+            throw e;
         }
-
-        if (instituicao.getEndereco() != null && instituicao.getEndereco().getId() != null) {
-            Endereco endereco = enderecoRepository.findById(instituicao.getEndereco().getId())
-                    .orElseThrow(() -> new RuntimeException("Endereço não encontrado."));
-            instituicao.setEndereco(endereco);
-        }
-
-        Instituicao novaInstituicao = instituicaoRepository.save(instituicao);
-
-        Usuario usuario = new Usuario();
-        usuario.setNome(instituicao.getNomeFantasia());
-        usuario.setEmail(instituicao.getEmail());
-        usuario.setSenha(passwordEncoder.encode(senha));
-        usuario = usuarioRepository.save(usuario);
-
-        UsuarioInstituicao usuarioInstituicao = new UsuarioInstituicao();
-        usuarioInstituicao.setUsuario(usuario);
-        usuarioInstituicao.setInstituicao(novaInstituicao);
-        usuarioInstituicao.setPermissao(Privilegio.ADMIN_MASTER);
-        usuarioInstituicaoRepository.save(usuarioInstituicao);
-
-        return novaInstituicao;
     }
+
 
     @Transactional
     public Instituicao updateInstituicao(Long id, Instituicao novaInstituicao, String senha) {

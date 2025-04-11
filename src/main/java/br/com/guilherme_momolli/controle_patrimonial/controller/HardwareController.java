@@ -35,6 +35,13 @@ public class HardwareController {
         return ResponseEntity.ok(hardware);
     }
 
+    @GetMapping("/instituicao/{instituicaoId}")
+    public ResponseEntity<List<Hardware>> listByInstituicao(@PathVariable Long instituicaoId) {
+        List<Hardware> hardwares = hardwareService.listByInstituicao(instituicaoId);
+        return ResponseEntity.ok(hardwares);
+    }
+
+
     @GetMapping("/list/agrupado")
     public ResponseEntity<Map<String, List<Hardware>>> listarAgrupado() {
         Map<String, List<Hardware>> agrupados = hardwareService.listarHardwareAgrupado();

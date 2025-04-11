@@ -2,6 +2,7 @@ package br.com.guilherme_momolli.controle_patrimonial.controller;
 
 import br.com.guilherme_momolli.controle_patrimonial.dto.AuthRequestDTO;
 import br.com.guilherme_momolli.controle_patrimonial.dto.AuthResponseDTO;
+import br.com.guilherme_momolli.controle_patrimonial.dto.FinalizarLoginDTO;
 import br.com.guilherme_momolli.controle_patrimonial.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,16 +21,14 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody AuthRequestDTO request) {
-        try {
-            AuthResponseDTO response = authService.authenticate(request);
-            return ResponseEntity.ok(response);
-        } catch (BadCredentialsException e) {
-            log.warn("Falha na autenticação: Credenciais inválidas para o usuário {}", request.getEmail());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        } catch (Exception e) {
-            log.error("Erro ao processar login para o usuário {}: {}", request.getEmail(), e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public ResponseEntity<AuthResponseDTO> iniciarLogin(@RequestBody AuthRequestDTO request) {
+        AuthResponseDTO response = authService.iniciarLogin(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/finalizar-login")
+    public ResponseEntity<AuthResponseDTO> finalizarLogin(@RequestBody FinalizarLoginDTO request) {
+        AuthResponseDTO response = authService.finalizarLogin(request.getEmail(), request.getInstituicaoId());
+        return ResponseEntity.ok(response);
     }
 }

@@ -17,5 +17,6 @@ public interface HardwareRepository extends JpaRepository<Hardware, Long> {
     @Query("SELECT h FROM Hardware h WHERE h.instituicao.id = :instituicaoId")
     List<Hardware> findByInstituicaoId(@Param("instituicaoId") Long instituicaoId);
 
+
 }
 

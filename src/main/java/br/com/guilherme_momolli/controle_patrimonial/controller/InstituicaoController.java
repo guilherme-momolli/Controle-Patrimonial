@@ -3,6 +3,7 @@ package br.com.guilherme_momolli.controle_patrimonial.controller;
 import br.com.guilherme_momolli.controle_patrimonial.dto.InstituicaoRequestDTO;
 import br.com.guilherme_momolli.controle_patrimonial.model.Instituicao;
 import br.com.guilherme_momolli.controle_patrimonial.service.InstituicaoService;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,23 +40,22 @@ public class InstituicaoController {
         }
     }
 
-    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(
+            value = "/create",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"
+    )
     public ResponseEntity<Instituicao> createInstituicao(
             @RequestPart("instituicao") String instituicaoJson,
-            @RequestParam("senha") String senha) {
+            @RequestParam(value = "senha") String senha) {
         try {
-
-            ObjectMapper objectMapper = new ObjectMapper();
             Instituicao instituicao = objectMapper.readValue(instituicaoJson, Instituicao.class);
-
-            Instituicao novaInstituicao = instituicaoService.createInstituicao(instituicao, senha);
-            return ResponseEntity.status(HttpStatus.CREATED).body(novaInstituicao);
+            Instituicao savedInstituicao = instituicaoService.createInstituicao(instituicao, senha);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedInstituicao);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
-
-
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateInstituicao(@PathVariable Long id, @RequestBody InstituicaoRequestDTO request) {

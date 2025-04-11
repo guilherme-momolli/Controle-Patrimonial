@@ -36,6 +36,10 @@ public class UsuarioService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
     }
 
+    public List<Usuario> listByInstituicao(Long id){
+        return usuarioRepository.findByInstituicaoId(id);
+    }
+
     @Transactional
     public Usuario createUsuario(CadastroRequestDTO cadastroRequestDTO) {
         if (usuarioRepository.findByEmail(cadastroRequestDTO.getEmail()).isPresent()) {

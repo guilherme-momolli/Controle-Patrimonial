@@ -27,6 +27,7 @@ public class EnderecoController {
         }
     }
 
+
     @GetMapping("/list/{id}")
     public ResponseEntity<Endereco> getEnderecoById(@PathVariable Long id) {
         try {
@@ -41,7 +42,7 @@ public class EnderecoController {
     public ResponseEntity<Endereco> createEndereco(@RequestBody Endereco endereco) {
         try {
             Endereco novoEndereco = enderecoService.createEndereco(endereco);
-            return ResponseEntity.status(HttpStatus.CREATED).body(novoEndereco); // Retorna o objeto criado
+            return ResponseEntity.status(HttpStatus.CREATED).body(novoEndereco);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }

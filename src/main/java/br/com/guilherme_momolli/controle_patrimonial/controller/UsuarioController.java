@@ -2,6 +2,7 @@ package br.com.guilherme_momolli.controle_patrimonial.controller;
 
 import br.com.guilherme_momolli.controle_patrimonial.dto.CadastroRequestDTO;
 import br.com.guilherme_momolli.controle_patrimonial.dto.VinculoRequestDTO;
+import br.com.guilherme_momolli.controle_patrimonial.model.Hardware;
 import br.com.guilherme_momolli.controle_patrimonial.model.Usuario;
 import br.com.guilherme_momolli.controle_patrimonial.model.UsuarioInstituicao;
 import br.com.guilherme_momolli.controle_patrimonial.model.enums.Privilegio;
@@ -39,6 +40,12 @@ public class UsuarioController {
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+    }
+
+    @GetMapping("/instituicao/{instituicaoId}")
+    public ResponseEntity<List<Usuario>> listByInstituicao(@PathVariable Long instituicaoId) {
+        List<Usuario> usuario = usuarioService.listByInstituicao(instituicaoId);
+        return ResponseEntity.ok(usuario);
     }
 
     @PostMapping("/create")

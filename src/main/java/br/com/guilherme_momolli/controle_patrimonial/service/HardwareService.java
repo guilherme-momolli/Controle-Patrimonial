@@ -1,6 +1,5 @@
 package br.com.guilherme_momolli.controle_patrimonial.service;
 
-import br.com.guilherme_momolli.controle_patrimonial.excepitions.file_storage.FileStorageException;
 import br.com.guilherme_momolli.controle_patrimonial.model.Hardware;
 import br.com.guilherme_momolli.controle_patrimonial.model.enums.Componente;
 import br.com.guilherme_momolli.controle_patrimonial.repository.HardwareRepository;
@@ -8,12 +7,9 @@ import br.com.guilherme_momolli.controle_patrimonial.repository.HardwareReposito
 import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -55,6 +51,10 @@ public class HardwareService {
             existingHardware.setImagemUrl(fileName);
         }
         return hardwareRepository.save(existingHardware);
+    }
+
+    public List<Hardware> listByInstituicao(Long instituicaoId) {
+        return hardwareRepository.findByInstituicaoId(instituicaoId);
     }
 
     public List<Hardware> listHardware() {
