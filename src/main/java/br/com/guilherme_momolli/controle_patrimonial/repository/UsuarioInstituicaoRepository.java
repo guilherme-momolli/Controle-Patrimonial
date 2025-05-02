@@ -22,6 +22,7 @@ public interface UsuarioInstituicaoRepository extends JpaRepository<UsuarioInsti
     List<UsuarioInstituicao> findByInstituicaoId(@Param("id") Long id);
 
     boolean existsByUsuarioAndInstituicao(Usuario usuario, Instituicao instituicao);
+
     Optional<UsuarioInstituicao> findByUsuarioAndInstituicao(Usuario usuario, Instituicao instituicao);
 
 }

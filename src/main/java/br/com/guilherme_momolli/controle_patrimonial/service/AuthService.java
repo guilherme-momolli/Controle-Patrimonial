@@ -44,33 +44,39 @@ public class AuthService {
 
         if (vinculos.size() == 1) {
             Long idInstituicao = vinculos.get(0).getInstituicao().getId();
-            String token = jwtUtil.generateToken(usuario.getEmail(), idInstituicao);
-            return new AuthResponseDTO(token, null);
+            String instituicaoNome = vinculos.get(0).getInstituicao().getNomeFantasia();
+            String token = jwtUtil.generateToken(usuario.getEmail(), idInstituicao, instituicaoNome, usuario.getNome());
+            return new AuthResponseDTO(token, usuario.getNome(), null);
         }
 
         List<InstituicaoDTO> instituicoes = vinculos.stream()
                 .map(v -> new InstituicaoDTO(v.getInstituicao()))
                 .toList();
 
-        return new AuthResponseDTO(null, instituicoes);
+        return new AuthResponseDTO(null, usuario.getNome(), instituicoes);
     }
-
 
     public AuthResponseDTO finalizarLogin(String email, Long instituicaoId) {
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        Instituicao instituicao = new Instituicao();
-        instituicao.setId(instituicaoId);
+        Instituicao instituicao = usuarioInstituicaoRepository.findByUsuarioEmail(email).stream()
+                .map(UsuarioInstituicao::getInstituicao)
+                .filter(inst -> inst.getId().equals(instituicaoId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Instituição não encontrada ou não vinculada ao usuário"));
 
-        boolean vinculado = usuarioInstituicaoRepository.existsByUsuarioAndInstituicao(usuario, instituicao);
+        String token = jwtUtil.generateToken(
+                email,
+                instituicaoId,
+                instituicao.getNomeFantasia(),
+                usuario.getNome()
+        );
 
-        if (!vinculado) {
-            throw new RuntimeException("Usuário não tem acesso à instituição selecionada.");
-        }
-
-        String token = jwtUtil.generateToken(email, instituicaoId);
-        return new AuthResponseDTO(token, null);
+        return new AuthResponseDTO(token, usuario.getNome(), null);
     }
+
+
+
 
 }

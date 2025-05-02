@@ -13,5 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 public class AuthResponseDTO {
     private String token;
+    private String usuarioNome;
     List<InstituicaoDTO> instituicoes;
 }
