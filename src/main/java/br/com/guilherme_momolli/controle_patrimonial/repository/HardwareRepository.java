@@ -1,6 +1,7 @@
 package br.com.guilherme_momolli.controle_patrimonial.repository;
 
 import br.com.guilherme_momolli.controle_patrimonial.model.Hardware;
+import br.com.guilherme_momolli.controle_patrimonial.model.enums.Componente;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,6 +17,8 @@ public interface HardwareRepository extends JpaRepository<Hardware, Long> {
 
     @Query("SELECT h FROM Hardware h WHERE h.instituicao.id = :instituicaoId")
     List<Hardware> findByInstituicaoId(@Param("instituicaoId") Long instituicaoId);
+
+    boolean existsByInstituicaoIdAndComponenteAndCodigoPatrimonial(Long instituicaoId, Componente componente, String codigoPatrimonial);
 
 
 }

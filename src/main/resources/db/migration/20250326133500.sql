@@ -13,8 +13,8 @@ CREATE TABLE endereco (
 
 CREATE TABLE instituicao (
     id BIGSERIAL PRIMARY KEY,
-    razao_social VARCHAR(255) NOT NULL UNIQUE,
-    nome_fantasia VARCHAR(255) NOT NULL UNIQUE,
+    razao_social VARCHAR(255) NOT NULL,
+    nome_fantasia VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     telefone_fixo VARCHAR(20) UNIQUE,
     telefone_celular VARCHAR(20) UNIQUE,
@@ -43,9 +43,9 @@ CREATE TABLE usuario_instituicao (
 
 CREATE TABLE hardware (
     id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    codigo_patrimonial VARCHAR(50) NOT NULL UNIQUE,
+    codigo_patrimonial VARCHAR(50) NOT NULL,
     componente VARCHAR(50) NOT NULL,
-    numero_serial VARCHAR(100) UNIQUE,
+    numero_serial VARCHAR(100),
     modelo VARCHAR(100),
     fabricante VARCHAR(100),
     velocidade VARCHAR(20),

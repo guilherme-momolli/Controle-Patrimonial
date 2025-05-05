@@ -3,6 +3,7 @@ package br.com.guilherme_momolli.controle_patrimonial.repository;
 import br.com.guilherme_momolli.controle_patrimonial.model.Instituicao;
 import br.com.guilherme_momolli.controle_patrimonial.model.Usuario;
 import br.com.guilherme_momolli.controle_patrimonial.model.UsuarioInstituicao;
+import br.com.guilherme_momolli.controle_patrimonial.model.enums.Componente;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,5 +25,6 @@ public interface UsuarioInstituicaoRepository extends JpaRepository<UsuarioInsti
     boolean existsByUsuarioAndInstituicao(Usuario usuario, Instituicao instituicao);
 
     Optional<UsuarioInstituicao> findByUsuarioAndInstituicao(Usuario usuario, Instituicao instituicao);
+
 
 }

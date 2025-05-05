@@ -21,9 +21,20 @@ public class HardwareService {
     private final FileStorageService fileStorageService;
 
     public Hardware createHardware(Hardware hardware, MultipartFile file) {
-        if (hardware.getComponente() == Componente.GABINETE && (hardware.getCodigoPatrimonial() == null || hardware.getCodigoPatrimonial().isEmpty())) {
-            throw new IllegalArgumentException("Código patrimonial é obrigatório para GABINETE.");
+        if ((hardware.getComponente() == Componente.GABINETE || hardware.getComponente() == Componente.NOTEBOOK)) {
+            if (hardware.getCodigoPatrimonial() == null || hardware.getCodigoPatrimonial().isEmpty()) {
+                throw new IllegalArgumentException("Código patrimonial é obrigatório para GABINETE e NOTEBOOK.");
+            }
+            boolean exists = hardwareRepository.existsByInstituicaoIdAndComponenteAndCodigoPatrimonial(
+                    hardware.getInstituicao().getId(),
+                    hardware.getComponente(),
+                    hardware.getCodigoPatrimonial()
+            );
+            if (exists) {
+                throw new IllegalArgumentException("Já existe um hardware com este código patrimonial para este componente nesta instituição.");
+            }
         }
+
         if (file != null && !file.isEmpty()) {
             String imagemUrl = fileStorageService.storeFile(file);
             hardware.setImagemUrl(imagemUrl);
@@ -31,9 +42,27 @@ public class HardwareService {
         return hardwareRepository.save(hardware);
     }
 
+
     @Transactional
     public Hardware updateHardware(Long id, Hardware hardware, MultipartFile file) {
-        Hardware existingHardware = hardwareRepository.findById(id).orElseThrow(() -> new RuntimeException("Hardware não encontrado"));
+        Hardware existingHardware = hardwareRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Hardware não encontrado"));
+
+        if ((hardware.getComponente() == Componente.GABINETE || hardware.getComponente() == Componente.NOTEBOOK)) {
+            if (hardware.getCodigoPatrimonial() == null || hardware.getCodigoPatrimonial().isEmpty()) {
+                throw new IllegalArgumentException("Código patrimonial é obrigatório para GABINETE e NOTEBOOK.");
+            }
+            boolean exists = hardwareRepository.existsByInstituicaoIdAndComponenteAndCodigoPatrimonial(
+                    hardware.getInstituicao().getId(),
+                    hardware.getComponente(),
+                    hardware.getCodigoPatrimonial()
+            );
+
+            // só dá erro se existir outro com esse código
+            if (exists && !hardware.getCodigoPatrimonial().equals(existingHardware.getCodigoPatrimonial())) {
+                throw new IllegalArgumentException("Já existe um hardware com este código patrimonial para este componente nesta instituição.");
+            }
+        }
 
         existingHardware.setCodigoPatrimonial(hardware.getCodigoPatrimonial());
         existingHardware.setFabricante(hardware.getFabricante());
@@ -50,8 +79,10 @@ public class HardwareService {
             String fileName = fileStorageService.storeFile(file);
             existingHardware.setImagemUrl(fileName);
         }
+
         return hardwareRepository.save(existingHardware);
     }
+
 
     public List<Hardware> listByInstituicao(Long instituicaoId) {
         return hardwareRepository.findByInstituicaoId(instituicaoId);

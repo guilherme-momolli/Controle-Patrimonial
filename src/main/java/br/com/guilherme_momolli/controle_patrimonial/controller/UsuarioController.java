@@ -24,19 +24,20 @@ public class UsuarioController {
 
     @GetMapping("/list")
     public ResponseEntity<List<Usuario>> listarUsuarios() {
-        try{
+        try {
             usuarioService.listUsuarios();
             return ResponseEntity.status(HttpStatus.OK).build();
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
+
     @GetMapping("/list/{id}")
     public ResponseEntity<Usuario> getUsuarioById(@PathVariable Long id) {
         try{
-            usuarioService.getById(id);
-            return ResponseEntity.status(HttpStatus.OK).build();
+            Usuario usuario = usuarioService.getById(id);
+            return ResponseEntity.ok(usuario);
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -60,13 +61,14 @@ public class UsuarioController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Usuario> updateUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
-        try{
-            usuarioService.updateUsuario(id, usuario);
-            return ResponseEntity.status(HttpStatus.OK).build();
-        }catch (Exception e){
+        try {
+            Usuario updatedUsuario = usuarioService.updateUsuario(id, usuario);
+            return ResponseEntity.ok(updatedUsuario);
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteUsuario(@PathVariable Long id) {
